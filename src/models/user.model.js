@@ -17,14 +17,21 @@ const userSchema = new mongoose.Schema(
             type:String,
             required: true,
             trim: true,
+    
             unique:true
+        },
+        role:{
+            type:String,
+            required:true,
+            enum:["user", "admin"],
+            default:"user"
         },
         cart:{
             type: Object,
             default:{}
         }
     },{
-        Timestamp: true
+        timestamps: true
     }
 );
 

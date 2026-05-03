@@ -10,8 +10,6 @@ const registerUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        console.log("BODY:", req.body);
-
         if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
@@ -40,7 +38,7 @@ const registerUser = async (req, res) => {
         const user = await User.create({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
         });
 
 
@@ -144,4 +142,49 @@ const UpdateUser = async(req, res) => {
     
     }
 }
-export { registerUser ,loginUser,UpdateUser };
+
+
+const adminlogin = async(req, res) => {
+    try {
+        // get data
+        const{ email, password} =req.body;
+     
+        const user = await User.findOne({email});
+      
+        // check role
+        if(!user || user.role !== "admin"){
+            return res.status(400)
+            .json({
+                success:false,
+                message:"Admin not found"
+            })
+        }
+
+        // check password
+         const isMatch = await bcrypt.compare(password, user.password);
+  
+        if(!isMatch){
+        return res.status(400)
+        .json({
+            success: false,
+            message:"Invalid credentials"
+        })
+        }
+
+        const token = createToken(user._id);
+        
+        return res.status(200)
+        .json({
+            success:true,
+            token
+        })
+    }catch(error){
+        console.log("Admin Login Error", error)
+        return res.status(500)
+        .json({
+            success:false, 
+            message: error.message
+        })
+    }
+}
+export { registerUser ,loginUser,UpdateUser, adminlogin };
