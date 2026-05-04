@@ -55,4 +55,75 @@ const createProduct = async(req ,res)=>{
     }
 }
 
-export {createProduct}
+
+const listProducts = async(req, res) =>{
+    try {
+        // get product
+      const products = await Product.find({});
+
+    //   return res
+      return res.status(200)
+      .json({
+        success:true,
+        products
+      })  
+    } catch (error) {
+        console.log("Product Listing Error", error)
+        return res.status(500)
+        .json({
+            success:false,
+            message:error.message
+        })
+    }
+}
+
+const getProduct = async(req, res) =>{
+    try {
+        // get id
+        const productId = req.params.id;
+
+        // get product
+        const product = await Product.findById(productId);
+
+        // return res
+        return res.status(200)
+        .json({
+            success:true,
+            product
+        })
+    } catch (error) {
+        console.log("Get Product Error", error);
+        return res.status(500)
+        .json({
+            success:false,
+            message:error.message
+        })
+    }
+}
+
+const deleteProduct = async(req, res) =>{
+    try {
+        // get id
+        const productId = req.params.id;
+
+        // delet from db
+        await Product.findByIdAndDelete(productId);
+        
+        // return res
+        return res.status(200)
+        .json({
+            success:true,
+            message:"Product Deleted"
+        })
+    } catch (error) {
+        console.log("Product Deleteion Error", error);
+        return res.status(500)
+        .json({
+            success:false,
+            message:error.message
+        })
+    }
+}
+
+
+export {createProduct, listProducts, deleteProduct,getProduct}

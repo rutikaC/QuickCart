@@ -1,18 +1,47 @@
-import { User } from "../models/user.model.js"
+import jwt from "jsonwebtoken";
 
-const isAdmin = async(req , res, next) =>{
-    // get user
-    const user = await User.findById(req.user.id);
-    // check role
+const isAdmin = async (req, res, next) => {
+  try {
 
-    if(user.role != "admin"){
-        return res.status(400)
-        .json({
-            success:false,
-            message:"Admin access only"
-        })
+    const authHeader = req.headers.authorization;
+   
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      
+      return res.status(401).json({
+        success: false,
+        message: "Not authorised"
+      });
     }
-    next();
-}
 
-export {isAdmin}
+    // extract token
+    const token = authHeader.split(" ")[1];
+
+
+    // verify token
+    const decodeToken = jwt.verify(token, process.env.JWT_SECRET);
+
+
+    // correct role check
+    if (decodeToken.role !== "admin") {
+      console.log("❌ Not admin");
+      return res.status(403).json({
+        success: false,
+        message: "Admin access only"
+      });
+    }
+
+    req.user = decodeToken;
+
+    next();
+
+  } catch (error) {
+    console.log("isAdmin Error", error.message);
+    return res.status(401).json({
+      success: false,
+      message: "Invalid token"
+    });
+  }
+};
+
+export { isAdmin };

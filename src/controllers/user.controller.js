@@ -2,14 +2,21 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 
-const createToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET);
+const createToken = (user) => {
+    return jwt.sign(
+        {
+            id: user._id,
+            role: user.role
+        },
+        process.env.JWT_SECRET,
+    );
 };
 
 const registerUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
+        //  validation
         if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
@@ -33,19 +40,23 @@ const registerUser = async (req, res) => {
             });
         }
 
+        //  hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // create user 
         const user = await User.create({
             name,
             email,
             password: hashedPassword,
+            role: "user" // or "admin" for testing
         });
 
+        //  generate token
+        const token = createToken(user);
 
+       
 
-        const token = createToken(user._id);
-
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             token
         });
@@ -58,6 +69,8 @@ const registerUser = async (req, res) => {
         });
     }
 };
+
+
 
 const loginUser = async( req, res) => {
     try {
@@ -144,47 +157,49 @@ const UpdateUser = async(req, res) => {
 }
 
 
-const adminlogin = async(req, res) => {
+const adminlogin = async (req, res) => {
     try {
-        // get data
-        const{ email, password} =req.body;
-     
-        const user = await User.findOne({email});
-      
-        // check role
-        if(!user || user.role !== "admin"){
-            return res.status(400)
-            .json({
-                success:false,
-                message:"Admin not found"
-            })
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+
+        //  check admin
+        if (!user || user.role !== "admin") {
+            return res.status(400).json({
+                success: false,
+                message: "Admin not found"
+            });
         }
 
         // check password
-         const isMatch = await bcrypt.compare(password, user.password);
-  
-        if(!isMatch){
-        return res.status(400)
-        .json({
-            success: false,
-            message:"Invalid credentials"
-        })
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials"
+            });
         }
 
-        const token = createToken(user._id);
+        // generate token (CORRECT WAY)
+        const token = createToken({
+            id: user._id,
+            role: user.role
+        });
+
         
-        return res.status(200)
-        .json({
-            success:true,
+
+        return res.status(200).json({
+            success: true,
             token
-        })
-    }catch(error){
-        console.log("Admin Login Error", error)
-        return res.status(500)
-        .json({
-            success:false, 
+        });
+
+    } catch (error) {
+        console.log("Admin Login Error", error.message);
+        return res.status(500).json({
+            success: false,
             message: error.message
-        })
+        });
     }
-}
+};
 export { registerUser ,loginUser,UpdateUser, adminlogin };

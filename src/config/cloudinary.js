@@ -8,5 +8,5 @@ const connectCloudinary = async () => {
     });
 }
 
-console.log(process.env.CLOUDINARY_API_KEY)
+
 export {connectCloudinary};

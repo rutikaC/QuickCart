@@ -12,7 +12,7 @@ const userAuth = async(req , res, next)=>{
         })
     }
     try {
-        const toekn_decode = jwt.verify(token, process.env.JWT_SECRET);
+        const decodeToken = jwt.verify(token, process.env.JWT_SECRET);
         req.body.userId = toekn_decode.id;
         next();
     } catch (error) {

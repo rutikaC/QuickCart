@@ -6,6 +6,7 @@ import { connectDB } from "./config/mongodb.js";
 import { userRouter } from "./routes/user.routes.js";
 import {prodcutRouter} from "./routes/product.routes.js";
 import { connectCloudinary } from "./config/cloudinary.js";
+import { OrderRouter } from "./routes/order.routes.js";
 
 // app config
 const app = express();
@@ -23,6 +24,8 @@ app.use(cors());
 app.use("/api/v1/user", userRouter)
 // product Routes
 app.use("/api/v1/products", prodcutRouter)
+// Order Routes
+app.use("/api/v1/orders", OrderRouter)
 
 app.use("/", (req, res) => {
     res.send("api working")
