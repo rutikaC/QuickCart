@@ -1,28 +1,32 @@
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
-const userAuth = async(req , res, next)=>{
+const userAuth = async (req, res, next) => {
+  // get token
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorised",
+      });
+    }
     // get token
-    const{token} = req.header;
 
-    if(!token){
-        return res.status(400)
-        .json({
-            success:false,
-            message:"Not authroised"
-        })
-    }
-    try {
-        const decodeToken = jwt.verify(token, process.env.JWT_SECRET);
-        req.body.userId = toekn_decode.id;
-        next();
-    } catch (error) {
-        console.log("User Auth Error", error);
-        res.status(500)
-        .json({
-            success:false,
-            message:error.message
-        })
-    }
-}
+    const token = authHeader.split(" ")[1];
 
-export  {userAuth}
+    // check token
+    const decodeToken = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = decodeToken;
+    next();
+  } catch (error) {
+    console.log("User Auth Error", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export { userAuth };

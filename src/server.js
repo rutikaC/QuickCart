@@ -7,6 +7,7 @@ import { userRouter } from "./routes/user.routes.js";
 import {prodcutRouter} from "./routes/product.routes.js";
 import { connectCloudinary } from "./config/cloudinary.js";
 import { OrderRouter } from "./routes/order.routes.js";
+import { cartRouter } from "./routes/cart.routes.js";
 
 // app config
 const app = express();
@@ -26,6 +27,8 @@ app.use("/api/v1/user", userRouter)
 app.use("/api/v1/products", prodcutRouter)
 // Order Routes
 app.use("/api/v1/orders", OrderRouter)
+// Cart Routes
+app.use("/api/v1/cart", cartRouter)
 
 app.use("/", (req, res) => {
     res.send("api working")
