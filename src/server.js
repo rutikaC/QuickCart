@@ -1,13 +1,18 @@
 import dotenv from "dotenv"
 dotenv.config({path: "./src/.env"});
+
+
 import express from "express"
 import cors from "cors"
+import { razorpay } from "./config/razorpay.js";
 import { connectDB } from "./config/mongodb.js";
 import { userRouter } from "./routes/user.routes.js";
-import {prodcutRouter} from "./routes/product.routes.js";
+import { prodcutRouter } from "./routes/product.routes.js";
 import { connectCloudinary } from "./config/cloudinary.js";
 import { OrderRouter } from "./routes/order.routes.js";
 import { cartRouter } from "./routes/cart.routes.js";
+
+
 
 // app config
 const app = express();
