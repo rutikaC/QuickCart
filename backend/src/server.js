@@ -16,7 +16,7 @@ import { cartRouter } from "./routes/cart.routes.js";
 
 // app config
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 //db connection
     connectDB();
